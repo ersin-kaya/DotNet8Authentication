@@ -1,9 +1,11 @@
 using DotNet8Authentication.Data;
 using DotNet8Authentication.Models;
-using Microsoft.AspNetCore.Identity;
+using DotNet8Authentication.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -19,6 +21,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IAccountService, AccountService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapControllers();
 
 app.MapIdentityApi<ApplicationUser>();
 
