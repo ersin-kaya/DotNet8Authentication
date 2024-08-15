@@ -9,11 +9,13 @@ public class AccountService : IAccountService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ITokenService _tokenService;
 
-    public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenService = tokenService;
     }
     
     public async Task<RegisterResponseDto> Register(RegisterModel model)
@@ -35,6 +37,8 @@ public class AccountService : IAccountService
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
+            var userToken = await _tokenService.GenerateJwtToken(user);
+            
             var response = new RegisterResponseDto
             {
                 Succeeded = true,
@@ -46,6 +50,7 @@ public class AccountService : IAccountService
                     UserName = user.UserName,
                     FullName = user.FullName
                 },
+                UserToken = userToken
             };
             return response;
         }

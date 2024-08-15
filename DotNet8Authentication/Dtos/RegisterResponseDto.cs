@@ -8,4 +8,5 @@ public class RegisterResponseDto
     public string? Message { get; set; }
     public IEnumerable<string>? ErrorMessages { get; set; }
     public CreatedUserDto<string>? CreatedUser { get; set; }
+    public UserToken? UserToken { get; set; }
 }
