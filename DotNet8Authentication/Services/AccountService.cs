@@ -50,7 +50,7 @@ public class AccountService : IAccountService
                     UserName = user.UserName,
                     FullName = user.FullName
                 },
-                UserToken = userToken
+                //UserToken = userToken
             };
             return response;
         }
