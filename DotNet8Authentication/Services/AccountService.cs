@@ -25,7 +25,7 @@ public class AccountService : IAccountService
             return new RegisterResponseDto
             {
                 Succeeded = false,
-                Message = Messages.EmailAlreadyInUse
+                ErrorMessages = new[] { Messages.EmailAlreadyInUse }
             };
 
         var user = new ApplicationUser(model.UserName)
