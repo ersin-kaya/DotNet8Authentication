@@ -25,7 +25,8 @@ public class AccountService : IAccountService
             return new RegisterResponseDto
             {
                 Succeeded = false,
-                ErrorMessages = new[] { Messages.EmailAlreadyInUse }
+                ErrorMessages = new[] { Messages.EmailAlreadyInUse },
+                Message = Messages.RegistrationError
             };
 
         var user = new ApplicationUser(model.UserName)
@@ -59,7 +60,8 @@ public class AccountService : IAccountService
         return new RegisterResponseDto
         {
             Succeeded = false,
-            ErrorMessages = errors
+            ErrorMessages = errors,
+            Message = Messages.RegistrationError
         };
     }
 }
