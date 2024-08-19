@@ -38,7 +38,7 @@ public class AccountService : IAccountService
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
-            var userToken = await _tokenService.GenerateJwtToken(user);
+            // var userToken = await _tokenService.GenerateJwtToken(user);
             
             var response = new RegisterResponseDto
             {
