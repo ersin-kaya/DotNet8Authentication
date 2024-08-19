@@ -1,4 +1,5 @@
 using System.Text;
+using DotNet8Authentication.Constants;
 using DotNet8Authentication.Data;
 using DotNet8Authentication.Models;
 using DotNet8Authentication.Services;
@@ -57,6 +58,12 @@ builder.Services.AddSingleton<ISettingsService, SettingsService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await EnsureRolesCreatedAsync(roleManager);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -91,6 +98,23 @@ app.MapGet("/weatherforecast", () =>
     .WithOpenApi();
 
 app.Run();
+
+async Task EnsureRolesCreatedAsync(RoleManager<IdentityRole> roleManager)
+{
+    var roles = new[]
+    {
+        RoleConstants.Admin,
+        RoleConstants.User
+    };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
