@@ -15,7 +15,7 @@ public class AccountController : ControllerBase
         _accountService = accountService;
     }
 
-    [HttpPost("createUser")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterModel model)
     {
         if (!ModelState.IsValid)
