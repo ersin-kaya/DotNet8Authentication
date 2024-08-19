@@ -38,6 +38,19 @@ public class AccountService : IAccountService
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
+            var roleResult = await _userManager.AddToRoleAsync(user, RoleConstants.User);
+
+            if (!roleResult.Succeeded)
+            {
+                var roleErrors = roleResult.Errors.Select(e => e.Description);
+                return new RegisterResponseDto
+                {
+                    Succeeded = false,
+                    ErrorMessages = roleErrors,
+                    Message = Messages.RoleAssignmentError
+                };
+            }
+            
             // var userToken = await _tokenService.GenerateJwtToken(user);
             
             var response = new RegisterResponseDto
