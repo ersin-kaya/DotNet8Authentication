@@ -6,4 +6,5 @@ namespace DotNet8Authentication.Services;
 public interface IAccountService
 {
     Task<RegisterResponseDto> Register(RegisterModel model);
+    Task<LoginResponseDto> Login(LoginModel model);
 }

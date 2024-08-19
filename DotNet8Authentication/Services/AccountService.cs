@@ -64,4 +64,34 @@ public class AccountService : IAccountService
             Message = Messages.RegistrationError
         };
     }
+
+    public async Task<LoginResponseDto> Login(LoginModel model)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+            return new LoginResponseDto
+            {
+                Succeeded = false,
+                ErrorMessages = new[] { Messages.InvalidLoginAttempt },
+                Message = Messages.LoginError
+            };
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+        if (!result.Succeeded)
+            return new LoginResponseDto
+            {
+                Succeeded = false,
+                ErrorMessages = new[] { Messages.InvalidLoginAttempt },
+                Message = Messages.LoginError
+            };
+
+        var userToken = await _tokenService.GenerateJwtToken(user);
+
+        return new LoginResponseDto
+        {
+            Succeeded = true,
+            Message = Messages.LoginSuccess,
+            UserToken = userToken
+        };
+    }
 }

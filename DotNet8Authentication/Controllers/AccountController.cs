@@ -28,4 +28,18 @@ public class AccountController : ControllerBase
 
         return BadRequest(result);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginModel model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _accountService.Login(model);
+
+        if (result.Succeeded)
+            return Ok(result);
+
+        return BadRequest(result);
+    }
 }
