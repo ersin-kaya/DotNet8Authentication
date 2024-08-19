@@ -11,4 +11,7 @@ public static class Messages
     public const string LoginSuccess = "Login successful.";
     public const string LoginError = "An error occurred during login.";
     public const string InvalidLoginAttempt = "Invalid email or password.";
+    
+    // Role assignment messages
+    public const string RoleAssignmentError = "An error occurred while assigning the role.";
 }
