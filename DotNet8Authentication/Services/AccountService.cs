@@ -52,6 +52,7 @@ public class AccountService : IAccountService
             }
             
             // var userToken = await _tokenService.GenerateJwtToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
             
             var response = new RegisterResponseDto
             {
@@ -62,7 +63,8 @@ public class AccountService : IAccountService
                     Id = user.Id,
                     Email = user.Email,
                     UserName = user.UserName,
-                    FullName = user.FullName
+                    FullName = user.FullName,
+                    Roles = roles
                 },
                 //UserToken = userToken
             };
