@@ -1,4 +1,5 @@
 using System.Text;
+using DotNet8Authentication.Constants;
 using DotNet8Authentication.Data;
 using DotNet8Authentication.Models;
 using DotNet8Authentication.Services;
@@ -57,6 +58,8 @@ builder.Services.AddSingleton<ISettingsService, SettingsService>();
 
 var app = builder.Build();
 
+await EnsureRolesCreatedAsync();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -91,6 +94,65 @@ app.MapGet("/weatherforecast", () =>
     .WithOpenApi();
 
 app.Run();
+
+async Task EnsureRolesCreatedAsync()
+{
+    var roles = new[]
+    {
+        RoleConstants.Admin,
+        RoleConstants.User
+    };
+
+    #region Task.WhenAll
+
+    // The 'foreach' loop processes each role sequentially, one after the other.
+    // Task.WhenAll allows processing all roles concurrently, improving performance by handling them simultaneously.
+    // await Task.WhenAll(
+    //     roles.Select(async role =>
+    //         {
+    //             using (var scope = app.Services.CreateScope())
+    //             {
+    //                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    //
+    //                 if (!await roleManager.RoleExistsAsync(role))
+    //                 {
+    //                     await roleManager.CreateAsync(new IdentityRole(role));
+    //                 }
+    //                 
+    //                 // A concurrency error occurred when parallel tasks were executed using Task.WhenAll,
+    //                 // causing the same DbContext instance to be used by multiple threads simultaneously.
+    //                 // To resolve this, a new ServiceScope should be created for each parallel task,
+    //                 // allowing the RoleManager and consequently the DbContext instance to be obtained from this scope.
+    //                 // This approach ensures that each task uses an independent DbContext instance, preventing the error.
+    //             }
+    //         })
+    // );
+
+    #endregion
+
+    #region Parallel.ForEachAsync
+
+    // Parallel.ForEachAsync is an asynchronous structure that executes tasks in parallel at the same time,
+    // while foreach is synchronous and processes tasks sequentially.
+    await Parallel.ForEachAsync(roles, async (role, cancellationToken) =>
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
+    });
+
+    #endregion
+    
+    // Parallel.ForEachAsync processes the elements of a collection in parallel and asynchronously,
+    // while Task.WhenAll runs independent asynchronous tasks together and waits for all of them to complete.
+    // Parallel.ForEachAsync is used for processing collections, while Task.WhenAll is used to start tasks in parallel.
+}
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
