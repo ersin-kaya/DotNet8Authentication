@@ -1,6 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using DotNet8Authentication.Constants;
 using DotNet8Authentication.Models;
 using DotNet8Authentication.Services.Settings;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +32,7 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.UserName)
         };
-        
+
         claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settingsService.TokenSettings.Key));
@@ -45,12 +47,52 @@ public class TokenService : ITokenService
         );
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        
+
         return new UserToken
         {
             AccessToken = tokenString,
             ExpiresAt = token.ValidTo
-            //todo: add refresh token
         };
+    }
+
+    public Task<UserToken> GenerateRefreshToken(ApplicationUser user)
+    {
+        var randomNumber = new byte[64];
+        using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
+        randomNumberGenerator.GetBytes(randomNumber);
+
+        var refreshToken = new UserToken
+        {
+            RefreshToken = Convert.ToBase64String(randomNumber)
+        };
+        
+        return Task.FromResult(refreshToken);
+    }
+
+    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    {
+        TokenValidationParameters tokenValidationParameters = new()
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = _settingsService.TokenSettings.Issuer,
+            ValidAudience = _settingsService.TokenSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settingsService.TokenSettings.Key)),
+            ClockSkew = TimeSpan.Zero
+        };
+
+        JwtSecurityTokenHandler tokenHandler = new();
+        ClaimsPrincipal principal =
+            tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+        if (securityToken is not JwtSecurityToken jwtSecurityToken
+            || !jwtSecurityToken.Header.Alg
+                .Equals(SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase)
+           )
+            throw new SecurityTokenException(Messages.InvalidToken);
+
+        return principal;
     }
 }
