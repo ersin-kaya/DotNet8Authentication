@@ -42,4 +42,18 @@ public class AccountController : ControllerBase
 
         return BadRequest(result);
     }
+    
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _accountService.RefreshToken(model);
+
+        if (result.Succeeded)
+            return Ok(result);
+
+        return BadRequest(result);
+    }
 }
