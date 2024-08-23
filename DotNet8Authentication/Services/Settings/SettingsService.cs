@@ -11,7 +11,8 @@ public class SettingsService : ISettingsService
             Audience = configuration["Jwt:Audience"],
             Issuer = configuration["Jwt:Issuer"],
             Key = configuration["Jwt:Key"],
-            ExpirationMinutes = int.Parse(configuration["Jwt:ExpirationMinutes"])
+            ExpirationMinutes = int.Parse(configuration["Jwt:ExpirationMinutes"]),
+            RefreshTokenExpirationDays = int.Parse(configuration["Jwt:RefreshTokenExpirationDays"])
         };
     }
 }
