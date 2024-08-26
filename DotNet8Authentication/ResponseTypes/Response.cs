@@ -4,7 +4,7 @@ namespace DotNet8Authentication.ResponseTypes;
 
 public class Response : IResponse
 {
-    public Response(bool succeeded, string message = null, int? statusCode = null)
+    public Response(bool succeeded, string? message = null, int? statusCode = null)
     {
         Succeeded = succeeded;
         Message = message;
@@ -12,7 +12,7 @@ public class Response : IResponse
     }
 
     public bool Succeeded { get; }
-    public string Message { get; }
+    public string? Message { get; }
     
     [JsonIgnore]
     public int StatusCode { get; }
