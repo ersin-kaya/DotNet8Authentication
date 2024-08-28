@@ -2,7 +2,7 @@ namespace DotNet8Authentication.ResponseTypes;
 
 public class DataResponse<T> : Response, IDataResponse<T>
 {
-    public DataResponse(T? data, bool succeeded, string? message = null, int? statusCode = null) : base(succeeded, message, statusCode)
+    public DataResponse(bool succeeded, T? data = default, string? message = null, int? statusCode = null) : base(succeeded, message, statusCode)
     {
         Data = data;
     }
