@@ -4,11 +4,24 @@ namespace DotNet8Authentication.ResponseTypes;
 
 public class Response : IResponse
 {
-    public Response(bool succeeded, string? message = null, int? statusCode = null)
+    public Response(bool succeeded, string message, int statusCode) : this(succeeded, message)
+    {
+        StatusCode = statusCode;
+    }
+    
+    public Response(bool succeeded, string message) : this(succeeded)
+    {
+        Message = message;
+    }
+    
+    public Response(bool succeeded, int statusCode) : this(succeeded)
+    {
+        StatusCode = statusCode;
+    }
+    
+    public Response(bool succeeded)
     {
         Succeeded = succeeded;
-        Message = message;
-        StatusCode = statusCode ?? (succeeded ? 200 : 500);
     }
 
     public bool Succeeded { get; }
