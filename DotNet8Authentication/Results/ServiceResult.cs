@@ -17,11 +17,6 @@ public class ServiceResult : IServiceResult
     {
         return new ServiceResult(succeeded:true, message:message);
     }
-    
-    public static ServiceResult Failure(string? message = null)
-    {
-        return new ServiceResult(succeeded:false, message:message);
-    }
 
     public static ServiceResult Failure(IEnumerable<string> errorMessages, string? message = null)
     {
