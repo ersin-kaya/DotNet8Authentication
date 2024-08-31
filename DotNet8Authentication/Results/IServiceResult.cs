@@ -4,7 +4,7 @@ public interface IServiceResult : IResult
 {
 }
 
-public interface IServiceResult<out T> : IResult
+public interface IServiceResult<out T> : IServiceResult
 {
     T? Data { get; }
 }
