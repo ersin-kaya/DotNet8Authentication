@@ -1,16 +1,18 @@
+using DotNet8Authentication.Constants;
+
 namespace DotNet8Authentication.Results;
 
 public class ServiceResult : IServiceResult
 {
     public bool Succeeded { get; }
     public string? Message { get; }
-    public IEnumerable<string> ErrorMessages { get; }
+    public IEnumerable<string>? ErrorMessages { get; }
 
     protected ServiceResult(bool succeeded, string? message = null, IEnumerable<string>? errorMessages = null)
     {
         Succeeded = succeeded;
-        Message = message ?? (succeeded ? "Operation completed successfully." : "Operation failed.");
-        ErrorMessages = errorMessages ?? new List<string>();
+        Message = message ?? (succeeded ? Messages.OperationSuccess : Messages.OperationFailed);
+        ErrorMessages = succeeded ? null : errorMessages ?? new List<string>();
     }
 
     public static ServiceResult Success(string? message = null)
