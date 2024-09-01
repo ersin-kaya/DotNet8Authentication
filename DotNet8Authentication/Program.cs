@@ -73,7 +73,7 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = tokenSettings.Issuer,
             ValidAudience = tokenSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.Key)),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero // This sets the time tolerance for JWT validation to zero, meaning the token must be valid exactly within the specified time frame, with no deviations allowed.
         };
     });
 
