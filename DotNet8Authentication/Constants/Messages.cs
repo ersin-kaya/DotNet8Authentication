@@ -2,6 +2,10 @@ namespace DotNet8Authentication.Constants;
 
 public static class Messages
 {
+    // General operation messages
+    public const string OperationSuccess = "Operation completed successfully.";
+    public const string OperationFailed = "Operation failed.";
+    
     // Registration messages
     public const string RegistrationSuccess = "Registration completed successfully.";
     public const string RegistrationError = "An error occurred during registration.";
