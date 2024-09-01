@@ -108,19 +108,14 @@ public class AccountService : IAccountService
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
-    public async Task<RefreshTokenResponseDto> RefreshToken(RefreshTokenRequestModel model)
+    public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model)
     {
         ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken);
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-            return new RefreshTokenResponseDto
-            {
-                Succeeded = false,
-                ErrorMessages = new[] { Messages.InvalidLoginAttempt },
-                Message = Messages.RefreshTokenFailed
-            };
+            return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
         if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
@@ -133,22 +128,21 @@ public class AccountService : IAccountService
         var updateResult = await _userManager.UpdateAsync(user);
 
         if (!updateResult.Succeeded) // Should be handled transactionally
-            return new RefreshTokenResponseDto
-            {
-                Succeeded = false,
-                ErrorMessages = updateResult.Errors.Select(e => e.Description).ToArray(),
-                Message = Messages.UserUpdateFailed
-            };
+        {
+            var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
+            return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessages:errorMessages, message:Messages.UserUpdateFailed);
+        }
 
         await _userManager.UpdateSecurityStampAsync(user);
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
-
-        return new RefreshTokenResponseDto
+        var refreshTokenResult = new RefreshTokenResponseDto
         {
             AccessToken = updatedAccessToken,
             RefreshToken = updatedRefreshToken,
             ExpiresAt = accessTokenExpiresAt
         };
+        
+        return ServiceResult<RefreshTokenResponseDto>.Success(data:refreshTokenResult, message:Messages.RefreshTokenSuccess);
     }
 }

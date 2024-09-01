@@ -4,10 +4,6 @@ namespace CustomIdentityAuth.Dtos;
 
 public class RefreshTokenResponseDto
 {
-    public bool Succeeded { get; set; }
-    public string? Message { get; set; }
-    public IEnumerable<string>? ErrorMessages { get; set; } = [];
-    
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; }
 

@@ -8,5 +8,5 @@ public interface IAccountService
 {
     Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model);
     Task<IServiceResult<LoginResponseDto>> Login(LoginModel model);
-    Task<RefreshTokenResponseDto> RefreshToken(RefreshTokenRequestModel model);
+    Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model);
 }
