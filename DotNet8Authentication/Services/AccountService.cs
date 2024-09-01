@@ -106,10 +106,10 @@ public class AccountService : IAccountService
             };
 
         var userToken = await _tokenService.GenerateJwtToken(user);
-        var userTokenForRefreshToken = await _tokenService.GenerateRefreshToken(user);
-        userToken.RefreshToken = userTokenForRefreshToken.RefreshToken;
+        string generatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).RefreshToken;
+        userToken.RefreshToken = generatedRefreshToken;
 
-        user.RefreshToken = userTokenForRefreshToken.RefreshToken;
+        user.RefreshToken = generatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         var updateResult = await _userManager.UpdateAsync(user);
 
