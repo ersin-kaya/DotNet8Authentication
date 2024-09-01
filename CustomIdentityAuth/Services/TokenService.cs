@@ -57,7 +57,7 @@ public class TokenService : ITokenService
         return ServiceResult<UserToken>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
     }
 
-    public Task<UserToken> GenerateRefreshToken(ApplicationUser user)
+    public Task<IServiceResult<UserToken>> GenerateRefreshToken(ApplicationUser user)
     {
         var randomNumber = new byte[64];
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
@@ -67,8 +67,9 @@ public class TokenService : ITokenService
         {
             RefreshToken = Convert.ToBase64String(randomNumber)
         };
-        
-        return Task.FromResult(refreshToken);
+
+        IServiceResult<UserToken> result = ServiceResult<UserToken>.Success(data: refreshToken);
+        return Task.FromResult(result);
     }
 
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)

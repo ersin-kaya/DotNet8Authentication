@@ -7,6 +7,6 @@ namespace CustomIdentityAuth.Services;
 public interface ITokenService
 {
     Task<IServiceResult<UserToken>> GenerateJwtToken(ApplicationUser user);
-    Task<UserToken> GenerateRefreshToken(ApplicationUser user);
+    Task<IServiceResult<UserToken>> GenerateRefreshToken(ApplicationUser user);
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }
