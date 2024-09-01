@@ -25,6 +25,9 @@ public static class Messages
     // User update messages
     public const string UserUpdateFailed = "User update failed. Please try again.";
     
+    // Token generation messages
+    public const string TokenGenerationSuccess = "Token generated successfully.";
+    
     // Refresh token messages
     public const string RefreshTokenFailed = "Failed to refresh the token. Please try again.";
     public const string InvalidRefreshToken = "The refresh token is invalid or has expired.";

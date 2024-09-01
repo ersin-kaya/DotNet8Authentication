@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +22,7 @@ public class TokenService : ITokenService
         _settingsService = settingsService;
     }
 
-    public async Task<UserToken> GenerateJwtToken(ApplicationUser user)
+    public async Task<IServiceResult<UserToken>> GenerateJwtToken(ApplicationUser user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -47,12 +48,13 @@ public class TokenService : ITokenService
         );
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return new UserToken
+        var userToken = new UserToken
         {
             AccessToken = tokenString,
             ExpiresAt = token.ValidTo
         };
+
+        return ServiceResult<UserToken>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
     }
 
     public Task<UserToken> GenerateRefreshToken(ApplicationUser user)
