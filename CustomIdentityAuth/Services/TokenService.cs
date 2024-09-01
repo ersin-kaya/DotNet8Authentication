@@ -68,11 +68,11 @@ public class TokenService : ITokenService
             RefreshToken = Convert.ToBase64String(randomNumber)
         };
 
-        IServiceResult<UserToken> result = ServiceResult<UserToken>.Success(data: refreshToken);
+        IServiceResult<UserToken> result = ServiceResult<UserToken>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
         return Task.FromResult(result);
     }
 
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    public IServiceResult<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
     {
         TokenValidationParameters tokenValidationParameters = new()
         {
@@ -96,6 +96,6 @@ public class TokenService : ITokenService
            )
             throw new SecurityTokenException(Messages.InvalidToken);
 
-        return principal;
+        return ServiceResult<ClaimsPrincipal>.Success(data:principal, message:Messages.PrincipalExtractionSuccess);
     }
 }

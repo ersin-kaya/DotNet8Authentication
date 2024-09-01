@@ -27,6 +27,10 @@ public static class Messages
     
     // Token generation messages
     public const string TokenGenerationSuccess = "Token generated successfully.";
+    public const string RefreshTokenGenerationSuccess = "Refresh token generated successfully.";
+    
+    // Token validation messages
+    public const string PrincipalExtractionSuccess = "Principal extracted successfully from the expired token.";
     
     // Refresh token messages
     public const string RefreshTokenFailed = "Failed to refresh the token. Please try again.";

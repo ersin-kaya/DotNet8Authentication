@@ -110,7 +110,7 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model)
     {
-        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken);
+        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
