@@ -2,6 +2,7 @@ using System.Security.Claims;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos;
 using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -23,16 +24,11 @@ public class AccountService : IAccountService
         _settingsService = settingsService;
     }
     
-    public async Task<RegisterResponseDto> Register(RegisterModel model)
+    public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
     {
         var existingUser = await _userManager.FindByEmailAsync(model.Email);
         if (existingUser != null)
-            return new RegisterResponseDto
-            {
-                Succeeded = false,
-                ErrorMessages = new[] { Messages.EmailAlreadyInUse },
-                Message = Messages.RegistrationError
-            };
+            return ServiceResult<RegisterResponseDto>.Failure(errorMessage:Messages.EmailAlreadyInUse, message:Messages.RegistrationError);
 
         var user = new ApplicationUser(model.UserName)
         {
@@ -48,21 +44,14 @@ public class AccountService : IAccountService
             if (!roleResult.Succeeded)
             {
                 var roleErrors = roleResult.Errors.Select(e => e.Description);
-                return new RegisterResponseDto
-                {
-                    Succeeded = false,
-                    ErrorMessages = roleErrors,
-                    Message = Messages.RoleAssignmentError
-                };
+                return ServiceResult<RegisterResponseDto>.Failure(errorMessages:roleErrors, message:Messages.RoleAssignmentError);
             }
             
             // var userToken = await _tokenService.GenerateJwtToken(user);
             var roles = await _userManager.GetRolesAsync(user);
             
-            var response = new RegisterResponseDto
+            var registrationResult = new RegisterResponseDto
             {
-                Succeeded = true,
-                Message = Messages.RegistrationSuccess,
                 CreatedUser = new CreatedUserDto<string>
                 {
                     Id = user.Id,
@@ -73,16 +62,11 @@ public class AccountService : IAccountService
                 },
                 //UserToken = userToken
             };
-            return response;
+            return ServiceResult<RegisterResponseDto>.Success(data:registrationResult, message:Messages.RegistrationSuccess);
         }
         
         var errors = result.Errors.Select(e => e.Description);
-        return new RegisterResponseDto
-        {
-            Succeeded = false,
-            ErrorMessages = errors,
-            Message = Messages.RegistrationError
-        };
+        return ServiceResult<RegisterResponseDto>.Failure(errorMessages:errors, message:Messages.RegistrationError);
     }
 
     public async Task<LoginResponseDto> Login(LoginModel model)
