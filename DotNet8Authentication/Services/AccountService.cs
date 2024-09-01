@@ -113,7 +113,7 @@ public class AccountService : IAccountService
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         var updateResult = await _userManager.UpdateAsync(user);
 
-        if (!updateResult.Succeeded) //Transactional
+        if (!updateResult.Succeeded) // Should be handled transactionally
             return new LoginResponseDto
             {
                 Succeeded = false,
@@ -152,10 +152,13 @@ public class AccountService : IAccountService
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
         string updatedAccessToken = (await _tokenService.GenerateJwtToken(user)).AccessToken;
+        string updatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).RefreshToken;
         
+        user.RefreshToken = updatedRefreshToken;
+        user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         var updateResult = await _userManager.UpdateAsync(user);
 
-        if (!updateResult.Succeeded) //Transactional
+        if (!updateResult.Succeeded) // Should be handled transactionally
             return new RefreshTokenResponseDto
             {
                 Succeeded = false,
@@ -170,7 +173,7 @@ public class AccountService : IAccountService
         return new RefreshTokenResponseDto
         {
             AccessToken = updatedAccessToken,
-            RefreshToken = model.RefreshToken,
+            RefreshToken = updatedRefreshToken,
             ExpiresAt = accessTokenExpiresAt
         };
     }
