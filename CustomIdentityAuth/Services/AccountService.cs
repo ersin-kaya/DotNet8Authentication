@@ -86,8 +86,8 @@ public class AccountService : IAccountService
                 message: Messages.LoginError);
 
         var userToken = await _tokenService.GenerateJwtToken(user);
-        string generatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).RefreshToken;
-        userToken.RefreshToken = generatedRefreshToken;
+        string generatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).Data.RefreshToken;
+        userToken.Data.RefreshToken = generatedRefreshToken;
 
         user.RefreshToken = generatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
@@ -102,15 +102,15 @@ public class AccountService : IAccountService
         await _userManager.UpdateSecurityStampAsync(user);
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
-        userToken.ExpiresAt = accessTokenExpiresAt;
+        userToken.Data.ExpiresAt = accessTokenExpiresAt;
 
-        var loginResult = new LoginResponseDto { UserToken = userToken };
+        var loginResult = new LoginResponseDto { UserToken = userToken.Data };
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
     public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model)
     {
-        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken);
+        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
@@ -120,8 +120,8 @@ public class AccountService : IAccountService
         if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
-        string updatedAccessToken = (await _tokenService.GenerateJwtToken(user)).AccessToken;
-        string updatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).RefreshToken;
+        string updatedAccessToken = (await _tokenService.GenerateJwtToken(user)).Data.AccessToken;
+        string updatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).Data.RefreshToken;
 
         user.RefreshToken = updatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);

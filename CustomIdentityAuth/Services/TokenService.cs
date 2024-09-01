@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +22,7 @@ public class TokenService : ITokenService
         _settingsService = settingsService;
     }
 
-    public async Task<UserToken> GenerateJwtToken(ApplicationUser user)
+    public async Task<IServiceResult<UserToken>> GenerateJwtToken(ApplicationUser user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -47,15 +48,16 @@ public class TokenService : ITokenService
         );
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return new UserToken
+        var userToken = new UserToken
         {
             AccessToken = tokenString,
             ExpiresAt = token.ValidTo
         };
+
+        return ServiceResult<UserToken>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
     }
 
-    public Task<UserToken> GenerateRefreshToken(ApplicationUser user)
+    public Task<IServiceResult<UserToken>> GenerateRefreshToken(ApplicationUser user)
     {
         var randomNumber = new byte[64];
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
@@ -65,11 +67,12 @@ public class TokenService : ITokenService
         {
             RefreshToken = Convert.ToBase64String(randomNumber)
         };
-        
-        return Task.FromResult(refreshToken);
+
+        IServiceResult<UserToken> result = ServiceResult<UserToken>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
+        return Task.FromResult(result);
     }
 
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    public IServiceResult<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
     {
         TokenValidationParameters tokenValidationParameters = new()
         {
@@ -93,6 +96,6 @@ public class TokenService : ITokenService
            )
             throw new SecurityTokenException(Messages.InvalidToken);
 
-        return principal;
+        return ServiceResult<ClaimsPrincipal>.Success(data:principal, message:Messages.PrincipalExtractionSuccess);
     }
 }
