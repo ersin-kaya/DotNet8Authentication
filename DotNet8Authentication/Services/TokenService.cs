@@ -80,7 +80,7 @@ public class TokenService : ITokenService
             ValidIssuer = _settingsService.TokenSettings.Issuer,
             ValidAudience = _settingsService.TokenSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settingsService.TokenSettings.Key)),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero // This sets the time tolerance for JWT validation to zero, meaning the token must be valid exactly within the specified time frame, with no deviations allowed.
         };
 
         JwtSecurityTokenHandler tokenHandler = new();
