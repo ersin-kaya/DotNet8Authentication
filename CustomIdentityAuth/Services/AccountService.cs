@@ -27,8 +27,8 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
     {
-        var existingUser = await _userManager.FindByEmailAsync(model.Email);
-        if (existingUser != null)
+        var userByEmail = await FindUserByEmailAsync(model.Email);
+        if (userByEmail != null)
             return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse,
                 message: Messages.RegistrationError);
 
@@ -42,7 +42,6 @@ public class AccountService : IAccountService
         if (result.Succeeded)
         {
             var roleResult = await _userManager.AddToRoleAsync(user, RoleConstants.User);
-
             if (!roleResult.Succeeded)
             {
                 var roleErrors = roleResult.Errors.Select(e => e.Description);
@@ -75,7 +74,7 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
+        var user = await FindUserByEmailAsync(model.Email);
         if (user == null)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
@@ -91,8 +90,8 @@ public class AccountService : IAccountService
 
         user.RefreshToken = generatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded) // Should be handled transactionally
         {
             var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
@@ -113,7 +112,7 @@ public class AccountService : IAccountService
         ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
-        ApplicationUser user = await _userManager.FindByEmailAsync(email);
+        ApplicationUser user = await FindUserByEmailAsync(email);
         if (user == null)
             return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
@@ -125,8 +124,8 @@ public class AccountService : IAccountService
 
         user.RefreshToken = updatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded) // Should be handled transactionally
         {
             var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
@@ -136,13 +135,18 @@ public class AccountService : IAccountService
         await _userManager.UpdateSecurityStampAsync(user);
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
+        
         var refreshTokenResult = new RefreshTokenResponseDto
         {
             AccessToken = updatedAccessToken,
             RefreshToken = updatedRefreshToken,
             ExpiresAt = accessTokenExpiresAt
         };
-        
         return ServiceResult<RefreshTokenResponseDto>.Success(data:refreshTokenResult, message:Messages.RefreshTokenSuccess);
+    }
+
+    private async Task<ApplicationUser?> FindUserByEmailAsync(string email)
+    {
+        return await _userManager.FindByEmailAsync(email);
     }
 }

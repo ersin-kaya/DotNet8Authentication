@@ -63,13 +63,10 @@ public class TokenService : ITokenService
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
         randomNumberGenerator.GetBytes(randomNumber);
 
-        var refreshToken = new UserToken
-        {
-            RefreshToken = Convert.ToBase64String(randomNumber)
-        };
+        var refreshToken = new UserToken { RefreshToken = Convert.ToBase64String(randomNumber) };
 
-        IServiceResult<UserToken> result = ServiceResult<UserToken>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
-        return Task.FromResult(result);
+        var result = ServiceResult<UserToken>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
+        return Task.FromResult((IServiceResult<UserToken>)result);
     }
 
     public IServiceResult<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
