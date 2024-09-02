@@ -42,7 +42,6 @@ public class AccountService : IAccountService
         if (result.Succeeded)
         {
             var roleResult = await _userManager.AddToRoleAsync(user, RoleConstants.User);
-
             if (!roleResult.Succeeded)
             {
                 var roleErrors = roleResult.Errors.Select(e => e.Description);
@@ -91,8 +90,8 @@ public class AccountService : IAccountService
 
         user.RefreshToken = generatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded) // Should be handled transactionally
         {
             var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
@@ -125,8 +124,8 @@ public class AccountService : IAccountService
 
         user.RefreshToken = updatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        
         var updateResult = await _userManager.UpdateAsync(user);
-
         if (!updateResult.Succeeded) // Should be handled transactionally
         {
             var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
@@ -136,13 +135,13 @@ public class AccountService : IAccountService
         await _userManager.UpdateSecurityStampAsync(user);
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
+        
         var refreshTokenResult = new RefreshTokenResponseDto
         {
             AccessToken = updatedAccessToken,
             RefreshToken = updatedRefreshToken,
             ExpiresAt = accessTokenExpiresAt
         };
-        
         return ServiceResult<RefreshTokenResponseDto>.Success(data:refreshTokenResult, message:Messages.RefreshTokenSuccess);
     }
 
