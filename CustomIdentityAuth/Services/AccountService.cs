@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Extensions;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
@@ -119,7 +120,7 @@ public class AccountService : IAccountService
         if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
-        string updatedAccessToken = (await _tokenService.GenerateJwtToken(user)).Data.AccessToken;
+        string updatedAccessToken = await _tokenService.GetAccessTokenAsync(user);
         string updatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).Data.RefreshToken;
 
         user.RefreshToken = updatedRefreshToken;

@@ -28,6 +28,7 @@ public static class Messages
     // Token generation messages
     public const string TokenGenerationSuccess = "Token generated successfully.";
     public const string RefreshTokenGenerationSuccess = "Refresh token generated successfully.";
+    public const string AccessTokenGenerationFailed = "Access token could not be generated.";
     
     // Token validation messages
     public const string PrincipalExtractionSuccess = "Principal extracted successfully from the expired token.";
