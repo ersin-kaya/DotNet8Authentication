@@ -27,8 +27,8 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
     {
-        var existingUser = await FindUserByEmailAsync(model.Email);
-        if (existingUser != null)
+        var userByEmail = await FindUserByEmailAsync(model.Email);
+        if (userByEmail != null)
             return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse,
                 message: Messages.RegistrationError);
 
