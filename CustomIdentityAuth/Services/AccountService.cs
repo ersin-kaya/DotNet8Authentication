@@ -27,7 +27,7 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
     {
-        var existingUser = await _userManager.FindByEmailAsync(model.Email);
+        var existingUser = await FindUserByEmailAsync(model.Email);
         if (existingUser != null)
             return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse,
                 message: Messages.RegistrationError);
@@ -75,7 +75,7 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
+        var user = await FindUserByEmailAsync(model.Email);
         if (user == null)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
@@ -113,7 +113,7 @@ public class AccountService : IAccountService
         ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
-        ApplicationUser user = await _userManager.FindByEmailAsync(email);
+        ApplicationUser user = await FindUserByEmailAsync(email);
         if (user == null)
             return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
@@ -144,5 +144,10 @@ public class AccountService : IAccountService
         };
         
         return ServiceResult<RefreshTokenResponseDto>.Success(data:refreshTokenResult, message:Messages.RefreshTokenSuccess);
+    }
+
+    private async Task<ApplicationUser?> FindUserByEmailAsync(string email)
+    {
+        return await _userManager.FindByEmailAsync(email);
     }
 }
