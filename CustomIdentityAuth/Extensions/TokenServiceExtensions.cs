@@ -12,6 +12,7 @@ public static class TokenServiceExtensions
     /// <param name="tokenService">ITokenService örneği.</param>
     /// <param name="user">Token oluşturulacak kullanıcı.</param>
     /// <returns>Access token string değeri.</returns>
+    /// <exception cref="ArgumentNullException">TokenService veya kullanıcı null ise.</exception>
     /// <exception cref="InvalidOperationException">Access token oluşturulamazsa.</exception>
     public static async Task<string> GetAccessTokenAsync(this ITokenService tokenService, ApplicationUser user)
     {
