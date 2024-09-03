@@ -35,6 +35,7 @@ public static class Messages
     
     // Refresh token messages
     public const string RefreshTokenFailed = "Failed to refresh the token. Please try again.";
+    public const string RefreshTokenGenerationFailed = "Refresh token could not be generated.";
     public const string InvalidRefreshToken = "The refresh token is invalid or has expired.";
     public const string RefreshTokenSuccess = "Refresh token generated successfully.";
 }

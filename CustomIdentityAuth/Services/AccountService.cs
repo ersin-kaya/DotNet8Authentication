@@ -86,7 +86,7 @@ public class AccountService : IAccountService
                 message: Messages.LoginError);
 
         var userToken = await _tokenService.GenerateJwtToken(user);
-        string generatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).Data.RefreshToken;
+        string generatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
         userToken.Data.RefreshToken = generatedRefreshToken;
 
         user.RefreshToken = generatedRefreshToken;
@@ -121,7 +121,7 @@ public class AccountService : IAccountService
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
         string updatedAccessToken = await _tokenService.GetAccessTokenAsync(user);
-        string updatedRefreshToken = (await _tokenService.GenerateRefreshToken(user)).Data.RefreshToken;
+        string updatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
 
         user.RefreshToken = updatedRefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
