@@ -2,6 +2,7 @@ using System.Security.Claims;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos;
 using CustomIdentityAuth.Extensions;
+using CustomIdentityAuth.Mappers;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
@@ -30,18 +31,22 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
     {
-        var userByEmail = await FindUserByEmailAsync(model.Email);
+        var userByEmail = await _userManager.FindByEmailAsync(model.Email);
         if (userByEmail != null)
-            return EmailAlreadyInUseError();
+            return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
 
-        var user = CreateApplicationUserFromRegisterModel(model);
-        var createUserResult = await CreateUserAsync(user, model.Password);
+        var user = model.CreateApplicationUserForRegister();
+        var createUserResult = await _userManager.CreateAsync(user, model.Password);
         if(!createUserResult.Succeeded)
-            return RegistrationFailed(createUserResult.Errors);
+            return ServiceResult<RegisterResponseDto>.Failure(
+                errorMessages: createUserResult.Errors.Select(e => e.Description), 
+                message: Messages.RegistrationError);
         
-        var roleResult = await AddUserToRoleAsync(user, RoleConstants.User);
+        var roleResult = await _userManager.AddToRoleAsync(user, RoleConstants.User);
         if (!roleResult.Succeeded)
-            return RoleAssignmentFailed(roleResult.Errors);
+            return ServiceResult<RegisterResponseDto>.Failure(
+                errorMessages: roleResult.Errors.Select(e => e.Description),
+                message: Messages.RoleAssignmentError);
         
         var registrationResult = await CreateRegistrationResponse(user);
         return ServiceResult<RegisterResponseDto>.Success(data: registrationResult, message: Messages.RegistrationSuccess);
@@ -49,7 +54,7 @@ public class AccountService : IAccountService
 
     public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
     {
-        var user = await FindUserByEmailAsync(model.Email);
+        var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
@@ -87,7 +92,7 @@ public class AccountService : IAccountService
         ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
-        ApplicationUser user = await FindUserByEmailAsync(email);
+        ApplicationUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
             return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
@@ -123,49 +128,6 @@ public class AccountService : IAccountService
     #endregion
     
     #region Helper Methods
-
-    private async Task<ApplicationUser?> FindUserByEmailAsync(string email)
-    {
-        return await _userManager.FindByEmailAsync(email);
-    }
-    
-    private IServiceResult<RegisterResponseDto> EmailAlreadyInUseError()
-    {
-        return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
-    }
-    
-    private ApplicationUser CreateApplicationUserFromRegisterModel(RegisterModel model)
-    {
-        return new ApplicationUser(model.UserName)
-        {
-            Email = model.Email,
-            FullName = model.FullName
-        };
-    }
-    
-    private async Task<IdentityResult> CreateUserAsync(ApplicationUser user, string password)
-    {
-        return await _userManager.CreateAsync(user, password);
-    }
-    
-    private IServiceResult<RegisterResponseDto> RegistrationFailed(IEnumerable<IdentityError> errors)
-    {
-        var errorMessages = errors.Select(e => e.Description);
-        return ServiceResult<RegisterResponseDto>.Failure(errorMessages: errorMessages, message: Messages.RegistrationError);
-    }
-    
-    private async Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role)
-    {
-        return await _userManager.AddToRoleAsync(user, role);
-    }
-    
-    private IServiceResult<RegisterResponseDto> RoleAssignmentFailed(IEnumerable<IdentityError> errors)
-    {
-        var errorMessages = errors.Select(e => e.Description);
-        return ServiceResult<RegisterResponseDto>.Failure(
-            errorMessages: errorMessages,
-            message: Messages.RoleAssignmentError);
-    }
     
     private async Task<RegisterResponseDto> CreateRegistrationResponse(ApplicationUser user)
     {
