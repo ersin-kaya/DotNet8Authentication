@@ -62,10 +62,13 @@ public class AccountService : IAccountService
         if (!result.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
-        var tokenGenerationResult = await BuildUserTokenAsync(user);
+        var tokenGenerationResult = await CreateUserTokenAsync(user);
         if (!tokenGenerationResult.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage:Messages.TokenGenerationFailed, message:Messages.LoginError);
-        (user, var userToken) = tokenGenerationResult.Data;
+        
+        var userToken = tokenGenerationResult.Data;
+        user.RefreshToken = userToken.RefreshToken;
+        user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded) // Should be handled transactionally
@@ -144,16 +147,12 @@ public class AccountService : IAccountService
         };
     }
 
-    private async Task<IServiceResult<(ApplicationUser User, UserToken Token)>> BuildUserTokenAsync(ApplicationUser user)
+    private async Task<IServiceResult<UserToken>> CreateUserTokenAsync(ApplicationUser user)
     {
         var userToken = await _tokenService.GenerateJwtToken(user);
-        string generatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
-        userToken.Data.RefreshToken = generatedRefreshToken;
+        userToken.Data.RefreshToken = await _tokenService.GetRefreshTokenAsync(user);
         
-        user.RefreshToken = generatedRefreshToken;
-        user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
-        
-        return ServiceResult<(ApplicationUser User, UserToken Token)>.Success(data:(user, userToken.Data));
+        return ServiceResult<UserToken>.Success(data:userToken.Data);
     }
 
     #endregion
