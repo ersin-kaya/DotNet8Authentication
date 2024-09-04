@@ -29,27 +29,27 @@ public class AccountService : IAccountService
 
     #region Public Service Methods
 
-    public async Task<IServiceResult<RegisterResponseDto>> Register(RegisterModel model)
+    public async Task<IServiceResult> Register(RegisterModel model)
     {
         var userByEmail = await _userManager.FindByEmailAsync(model.Email);
         if (userByEmail != null)
-            return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
+            return ServiceResult.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
 
         var user = model.MapToApplicationUserForRegister();
         var createUserResult = await _userManager.CreateAsync(user, model.Password);
         if(!createUserResult.Succeeded)
-            return ServiceResult<RegisterResponseDto>.Failure(
+            return ServiceResult.Failure(
                 errorMessages: createUserResult.Errors.Select(e => e.Description), 
                 message: Messages.RegistrationError);
         
         var roleResult = await _userManager.AddToRoleAsync(user, RoleConstants.User);
         if (!roleResult.Succeeded)
-            return ServiceResult<RegisterResponseDto>.Failure(
+            return ServiceResult.Failure(
                 errorMessages: roleResult.Errors.Select(e => e.Description),
                 message: Messages.RoleAssignmentError);
         
         var registrationResult = await CreateRegistrationResponse(user);
-        return ServiceResult<RegisterResponseDto>.Success(data: registrationResult, message: Messages.RegistrationSuccess);
+        return ServiceResult.Success(message: Messages.RegistrationSuccess);
     }
 
     public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
