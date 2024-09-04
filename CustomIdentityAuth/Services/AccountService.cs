@@ -74,10 +74,10 @@ public class AccountService : IAccountService
         user.RefreshToken = userToken.RefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         
-        var updateResult = await _userManager.UpdateAsync(user);
-        if (!updateResult.Succeeded) // Should be handled transactionally
+        var updateUserResult = await _userManager.UpdateAsync(user);
+        if (!updateUserResult.Succeeded) // Should be handled transactionally
             return ServiceResult<LoginResponseDto>.Failure(
-                errorMessages: updateResult.Errors.Select(e => e.Description), 
+                errorMessages: updateUserResult.Errors.Select(e => e.Description), 
                 message: Messages.UserUpdateFailed);
 
         var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(user);
