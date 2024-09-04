@@ -48,7 +48,11 @@ public class AccountService : IAccountService
                 errorMessages: roleResult.Errors.Select(e => e.Description),
                 message: Messages.RoleAssignmentError);
         
-        var registrationResult = await CreateRegistrationResponse(user);
+        // var registrationResponse = new RegisterResponseDto
+        // {
+        //     CreatedUser = user.MapToCreatedUserDto(roles: await _userManager.GetRolesAsync(user))
+        // };
+        
         return ServiceResult.Success(message: Messages.RegistrationSuccess);
     }
 
@@ -129,23 +133,6 @@ public class AccountService : IAccountService
     #endregion
     
     #region Helper Methods
-    
-    private async Task<RegisterResponseDto> CreateRegistrationResponse(ApplicationUser user)
-    {
-        var roles = await _userManager.GetRolesAsync(user);
-        return new RegisterResponseDto
-        {
-            CreatedUser = new CreatedUserDto<string>
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                FullName = user.FullName,
-                Roles = roles
-            },
-            // UserToken = await _tokenService.GenerateJwtToken(user)
-        };
-    }
 
     private async Task<IServiceResult<UserToken>> CreateUserTokenAsync(ApplicationUser user)
     {
