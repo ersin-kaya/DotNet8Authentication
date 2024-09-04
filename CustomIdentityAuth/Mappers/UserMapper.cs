@@ -4,7 +4,7 @@ namespace CustomIdentityAuth.Mappers;
 
 public static class UserMapper
 {
-    public static ApplicationUser CreateApplicationUserForRegister(this RegisterModel model)
+    public static ApplicationUser MapToApplicationUserForRegister(this RegisterModel model)
     {
         return new ApplicationUser(model.UserName)
         {

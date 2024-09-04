@@ -35,7 +35,7 @@ public class AccountService : IAccountService
         if (userByEmail != null)
             return ServiceResult<RegisterResponseDto>.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
 
-        var user = model.CreateApplicationUserForRegister();
+        var user = model.MapToApplicationUserForRegister();
         var createUserResult = await _userManager.CreateAsync(user, model.Password);
         if(!createUserResult.Succeeded)
             return ServiceResult<RegisterResponseDto>.Failure(
