@@ -56,34 +56,32 @@ public class AccountService : IAccountService
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
-            return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
-                message: Messages.LoginError);
+            return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
         if (!result.Succeeded)
-            return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
-                message: Messages.LoginError);
+            return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
-        var userToken = await _tokenService.GenerateJwtToken(user);
-        string generatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
-        userToken.Data.RefreshToken = generatedRefreshToken;
-
-        user.RefreshToken = generatedRefreshToken;
-        user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        var tokenGenerationResult = await BuildUserTokenAsync(user);
+        if (!tokenGenerationResult.Succeeded)
+            return ServiceResult<LoginResponseDto>.Failure(errorMessage:Messages.TokenGenerationFailed, message:Messages.LoginError);
+        (user, var userToken) = tokenGenerationResult.Data;
         
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded) // Should be handled transactionally
-        {
-            var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
-            return ServiceResult<LoginResponseDto>.Failure(errorMessages: errorMessages, message: Messages.UserUpdateFailed);
-        }
+            return ServiceResult<LoginResponseDto>.Failure(
+                errorMessages: updateResult.Errors.Select(e => e.Description), 
+                message: Messages.UserUpdateFailed);
 
-        await _userManager.UpdateSecurityStampAsync(user);
-
-        var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
-        userToken.Data.ExpiresAt = accessTokenExpiresAt;
-
-        var loginResult = new LoginResponseDto { UserToken = userToken.Data };
+        var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(user);
+        if (!updateSecurityStampResult.Succeeded) // Should be handled transactionally
+            return ServiceResult<LoginResponseDto>.Failure(
+                errorMessages: updateSecurityStampResult.Errors.Select(e => e.Description), 
+                message: Messages.SecurityStampUpdateFailed); 
+        
+        userToken.ExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
+        
+        var loginResult = new LoginResponseDto { UserToken = userToken };
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
@@ -144,6 +142,18 @@ public class AccountService : IAccountService
             },
             // UserToken = await _tokenService.GenerateJwtToken(user)
         };
+    }
+
+    private async Task<IServiceResult<(ApplicationUser User, UserToken Token)>> BuildUserTokenAsync(ApplicationUser user)
+    {
+        var userToken = await _tokenService.GenerateJwtToken(user);
+        string generatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
+        userToken.Data.RefreshToken = generatedRefreshToken;
+        
+        user.RefreshToken = generatedRefreshToken;
+        user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
+        
+        return ServiceResult<(ApplicationUser User, UserToken Token)>.Success(data:(user, userToken.Data));
     }
 
     #endregion

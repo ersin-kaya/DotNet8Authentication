@@ -24,11 +24,13 @@ public static class Messages
     
     // User update messages
     public const string UserUpdateFailed = "User update failed. Please try again.";
+    public const string SecurityStampUpdateFailed = "Failed to update the security stamp. Please try again.";
     
     // Token generation messages
     public const string TokenGenerationSuccess = "Token generated successfully.";
     public const string RefreshTokenGenerationSuccess = "Refresh token generated successfully.";
     public const string AccessTokenGenerationFailed = "Access token could not be generated.";
+    public const string TokenGenerationFailed = "Token generation failed. Please try again.";
     
     // Token validation messages
     public const string PrincipalExtractionSuccess = "Principal extracted successfully from the expired token.";
