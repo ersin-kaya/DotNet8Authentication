@@ -87,8 +87,8 @@ public class AccountService : IAccountService
                 message: Messages.SecurityStampUpdateFailed); 
         
         userToken.ExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
-        
-        var loginResult = new LoginResponseDto { UserToken = userToken };
+
+        var loginResult = userToken.MapToLoginResponseDto();
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
