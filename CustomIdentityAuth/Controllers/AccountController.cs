@@ -8,11 +8,11 @@ namespace CustomIdentityAuth.Controllers;
 [ApiController]
 public class AccountController : ControllerBase
 {
-    private readonly IAccountService _accountService;
+    private readonly IAuthService _authService;
 
-    public AccountController(IAccountService accountService)
+    public AccountController(IAuthService authService)
     {
-        _accountService = accountService;
+        _authService = authService;
     }
 
     [HttpPost("register")]
@@ -21,7 +21,7 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _accountService.Register(model);
+        var result = await _authService.Register(model);
 
         if (result.Succeeded)
             return Ok(result);
@@ -35,7 +35,7 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _accountService.Login(model);
+        var result = await _authService.Login(model);
 
         if (result.Succeeded)
             return Ok(result);
@@ -49,7 +49,7 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _accountService.RefreshToken(model);
+        var result = await _authService.RefreshToken(model);
 
         if (result.Succeeded)
             return Ok(result);

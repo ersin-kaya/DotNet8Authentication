@@ -11,14 +11,14 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CustomIdentityAuth.Services;
 
-public class AccountService : IAccountService
+public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
     private readonly ISettingsService _settingsService;
 
-    public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
+    public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
         ITokenService tokenService, ISettingsService settingsService)
     {
         _userManager = userManager;
