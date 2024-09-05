@@ -103,30 +103,26 @@ public class AccountService : IAccountService
 
         if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
-
-        string updatedAccessToken = await _tokenService.GetAccessTokenAsync(user);
-        string updatedRefreshToken = await _tokenService.GetRefreshTokenAsync(user);
-
-        user.RefreshToken = updatedRefreshToken;
+        
+        var updatedUserToken = (await CreateUserTokenAsync(user)).Data;
+        user.RefreshToken = updatedUserToken.RefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
         
-        var updateResult = await _userManager.UpdateAsync(user);
-        if (!updateResult.Succeeded) // Should be handled transactionally
-        {
-            var errorMessages = updateResult.Errors.Select(e => e.Description).ToArray();
-            return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessages:errorMessages, message:Messages.UserUpdateFailed);
-        }
-
-        await _userManager.UpdateSecurityStampAsync(user);
+        var updateUserResult = await _userManager.UpdateAsync(user);
+        if (!updateUserResult.Succeeded) // Should be handled transactionally
+            return ServiceResult<RefreshTokenResponseDto>.Failure(
+                errorMessages:updateUserResult.Errors.Select(e => e.Description), 
+                message:Messages.UserUpdateFailed);
+        
+        var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(user);
+        if (!updateSecurityStampResult.Succeeded) // Should be handled transactionally
+            return ServiceResult<RefreshTokenResponseDto>.Failure(
+                errorMessages: updateSecurityStampResult.Errors.Select(e => e.Description), 
+                message: Messages.SecurityStampUpdateFailed); 
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
         
-        var refreshTokenResult = new RefreshTokenResponseDto
-        {
-            AccessToken = updatedAccessToken,
-            RefreshToken = updatedRefreshToken,
-            ExpiresAt = accessTokenExpiresAt
-        };
+        var refreshTokenResult = updatedUserToken.MapToRefreshTokenResponseDto(accessTokenExpiresAt);
         return ServiceResult<RefreshTokenResponseDto>.Success(data:refreshTokenResult, message:Messages.RefreshTokenSuccess);
     }
 
