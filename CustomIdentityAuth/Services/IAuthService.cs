@@ -4,7 +4,7 @@ using CustomIdentityAuth.Results;
 
 namespace CustomIdentityAuth.Services;
 
-public interface IAccountService
+public interface IAuthService
 {
     Task<IServiceResult> Register(RegisterModel model);
     Task<IServiceResult<LoginResponseDto>> Login(LoginModel model);
