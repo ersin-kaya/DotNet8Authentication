@@ -82,6 +82,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ISettingsService, SettingsService>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
