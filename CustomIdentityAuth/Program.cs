@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Data;
@@ -82,6 +83,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<ISettingsService, SettingsService>();
+
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
