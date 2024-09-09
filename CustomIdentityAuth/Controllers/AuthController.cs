@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequestDto requestDto)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequestDto requestDto)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
