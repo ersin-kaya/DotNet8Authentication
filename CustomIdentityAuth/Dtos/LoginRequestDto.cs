@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using CustomIdentityAuth.Constants;
 
-namespace CustomIdentityAuth.Models;
+namespace CustomIdentityAuth.Dtos;
 
-public class LoginModel
+public class LoginRequestDto
 {
     [Required]
     [EmailAddress]

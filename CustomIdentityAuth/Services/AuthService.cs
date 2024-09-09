@@ -56,13 +56,13 @@ public class AuthService : IAuthService
         return ServiceResult.Success(message: Messages.RegistrationSuccess);
     }
 
-    public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
+    public async Task<IServiceResult<LoginResponseDto>> Login(LoginRequestDto requestDto)
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
+        var user = await _userManager.FindByEmailAsync(requestDto.Email);
         if (user == null)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, requestDto.Password, lockoutOnFailure: false);
         if (!result.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
