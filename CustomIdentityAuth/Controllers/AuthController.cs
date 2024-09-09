@@ -1,4 +1,4 @@
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Dtos;
 using CustomIdentityAuth.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +16,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterModel model)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.Register(model);
+        var result = await _authService.Register(requestDto);
 
         if (result.Succeeded)
             return Ok(result);
@@ -30,12 +30,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginModel model)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.Login(model);
+        var result = await _authService.Login(requestDto);
 
         if (result.Succeeded)
             return Ok(result);
@@ -44,12 +44,12 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel model)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.RefreshToken(model);
+        var result = await _authService.RefreshToken(requestDto);
 
         if (result.Succeeded)
             return Ok(result);

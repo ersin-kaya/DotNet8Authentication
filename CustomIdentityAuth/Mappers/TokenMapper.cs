@@ -1,21 +1,20 @@
 using CustomIdentityAuth.Dtos;
-using CustomIdentityAuth.Models;
 
 namespace CustomIdentityAuth.Mappers;
 
 public static class TokenMapper
 {
-    public static LoginResponseDto MapToLoginResponseDto(this UserToken userToken)
+    public static LoginResponseDto MapToLoginResponseDto(this AuthTokenDto authTokenDto)
     {
-        return new LoginResponseDto { UserToken = userToken };
+        return new LoginResponseDto { AuthTokenDto = authTokenDto };
     }
     
-    public static RefreshTokenResponseDto MapToRefreshTokenResponseDto(this UserToken userToken, DateTime accessTokenExpiresAt)
+    public static RefreshTokenResponseDto MapToRefreshTokenResponseDto(this AuthTokenDto authTokenDto, DateTime accessTokenExpiresAt)
     {
         return new RefreshTokenResponseDto
         {
-            AccessToken = userToken.AccessToken,
-            RefreshToken = userToken.RefreshToken,
+            AccessToken = authTokenDto.AccessToken,
+            RefreshToken = authTokenDto.RefreshToken,
             ExpiresAt = accessTokenExpiresAt
         };
     }

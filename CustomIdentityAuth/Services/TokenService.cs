@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
+using CustomIdentityAuth.Dtos;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
@@ -22,7 +23,7 @@ public class TokenService : ITokenService
         _settingsService = settingsService;
     }
 
-    public async Task<IServiceResult<UserToken>> GenerateJwtToken(ApplicationUser user)
+    public async Task<IServiceResult<AuthTokenDto>> GenerateJwtToken(ApplicationUser user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
         
@@ -47,21 +48,21 @@ public class TokenService : ITokenService
         );
         
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        var userToken = new UserToken { AccessToken = tokenString, ExpiresAt = token.ValidTo };
+        var userToken = new AuthTokenDto { AccessToken = tokenString, ExpiresAt = token.ValidTo };
         
-        return ServiceResult<UserToken>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
+        return ServiceResult<AuthTokenDto>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
     }
 
-    public Task<IServiceResult<UserToken>> GenerateRefreshToken(ApplicationUser user)
+    public Task<IServiceResult<AuthTokenDto>> GenerateRefreshToken(ApplicationUser user)
     {
         var randomNumber = new byte[64];
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
         randomNumberGenerator.GetBytes(randomNumber);
 
-        var refreshToken = new UserToken { RefreshToken = Convert.ToBase64String(randomNumber) };
+        var refreshToken = new AuthTokenDto { RefreshToken = Convert.ToBase64String(randomNumber) };
 
-        var result = ServiceResult<UserToken>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
-        return Task.FromResult((IServiceResult<UserToken>)result);
+        var result = ServiceResult<AuthTokenDto>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
+        return Task.FromResult((IServiceResult<AuthTokenDto>)result);
     }
 
     public IServiceResult<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)

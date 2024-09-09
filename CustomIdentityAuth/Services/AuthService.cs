@@ -29,14 +29,14 @@ public class AuthService : IAuthService
 
     #region Public Service Methods
 
-    public async Task<IServiceResult> Register(RegisterModel model)
+    public async Task<IServiceResult> Register(RegisterRequestDto requestDto)
     {
-        var userByEmail = await _userManager.FindByEmailAsync(model.Email);
+        var userByEmail = await _userManager.FindByEmailAsync(requestDto.Email);
         if (userByEmail != null)
             return ServiceResult.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
 
-        var user = model.MapToApplicationUserForRegister();
-        var createUserResult = await _userManager.CreateAsync(user, model.Password);
+        var user = requestDto.MapToApplicationUserForRegister();
+        var createUserResult = await _userManager.CreateAsync(user, requestDto.Password);
         if(!createUserResult.Succeeded)
             return ServiceResult.Failure(
                 errorMessages: createUserResult.Errors.Select(e => e.Description), 
@@ -56,13 +56,13 @@ public class AuthService : IAuthService
         return ServiceResult.Success(message: Messages.RegistrationSuccess);
     }
 
-    public async Task<IServiceResult<LoginResponseDto>> Login(LoginModel model)
+    public async Task<IServiceResult<LoginResponseDto>> Login(LoginRequestDto requestDto)
     {
-        var user = await _userManager.FindByEmailAsync(model.Email);
+        var user = await _userManager.FindByEmailAsync(requestDto.Email);
         if (user == null)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, requestDto.Password, lockoutOnFailure: false);
         if (!result.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt, message: Messages.LoginError);
 
@@ -92,16 +92,16 @@ public class AuthService : IAuthService
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
-    public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model)
+    public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestDto)
     {
-        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
+        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(requestDto.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
             return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
-        if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
+        if (user.RefreshToken != requestDto.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
         
         var updatedUserToken = (await CreateUserTokenAsync(user)).Data;
@@ -130,12 +130,12 @@ public class AuthService : IAuthService
     
     #region Helper Methods
 
-    private async Task<IServiceResult<UserToken>> CreateUserTokenAsync(ApplicationUser user)
+    private async Task<IServiceResult<AuthTokenDto>> CreateUserTokenAsync(ApplicationUser user)
     {
         var userToken = await _tokenService.GenerateJwtToken(user);
         userToken.Data.RefreshToken = await _tokenService.GetRefreshTokenAsync(user);
         
-        return ServiceResult<UserToken>.Success(data:userToken.Data);
+        return ServiceResult<AuthTokenDto>.Success(data:userToken.Data);
     }
 
     #endregion
