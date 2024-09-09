@@ -130,12 +130,12 @@ public class AuthService : IAuthService
     
     #region Helper Methods
 
-    private async Task<IServiceResult<UserToken>> CreateUserTokenAsync(ApplicationUser user)
+    private async Task<IServiceResult<AuthTokenDto>> CreateUserTokenAsync(ApplicationUser user)
     {
         var userToken = await _tokenService.GenerateJwtToken(user);
         userToken.Data.RefreshToken = await _tokenService.GetRefreshTokenAsync(user);
         
-        return ServiceResult<UserToken>.Success(data:userToken.Data);
+        return ServiceResult<AuthTokenDto>.Success(data:userToken.Data);
     }
 
     #endregion
