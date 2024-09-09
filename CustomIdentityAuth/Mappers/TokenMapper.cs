@@ -1,5 +1,4 @@
 using CustomIdentityAuth.Dtos;
-using CustomIdentityAuth.Models;
 
 namespace CustomIdentityAuth.Mappers;
 

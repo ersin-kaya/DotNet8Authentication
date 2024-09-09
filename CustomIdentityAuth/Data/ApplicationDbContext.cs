@@ -1,6 +1,5 @@
 using CustomIdentityAuth.Data.DataSeeds;
 using CustomIdentityAuth.Models;
-using CustomIdentityAuth.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
