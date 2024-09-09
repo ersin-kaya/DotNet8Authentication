@@ -29,14 +29,14 @@ public class AuthService : IAuthService
 
     #region Public Service Methods
 
-    public async Task<IServiceResult> Register(RegisterModel model)
+    public async Task<IServiceResult> Register(RegisterRequestDto requestDto)
     {
-        var userByEmail = await _userManager.FindByEmailAsync(model.Email);
+        var userByEmail = await _userManager.FindByEmailAsync(requestDto.Email);
         if (userByEmail != null)
             return ServiceResult.Failure(errorMessage: Messages.EmailAlreadyInUse, message: Messages.RegistrationError);
 
-        var user = model.MapToApplicationUserForRegister();
-        var createUserResult = await _userManager.CreateAsync(user, model.Password);
+        var user = requestDto.MapToApplicationUserForRegister();
+        var createUserResult = await _userManager.CreateAsync(user, requestDto.Password);
         if(!createUserResult.Succeeded)
             return ServiceResult.Failure(
                 errorMessages: createUserResult.Errors.Select(e => e.Description), 

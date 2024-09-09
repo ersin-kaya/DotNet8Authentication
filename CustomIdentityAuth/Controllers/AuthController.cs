@@ -1,3 +1,4 @@
+using CustomIdentityAuth.Dtos;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterModel model)
+    public async Task<IActionResult> Register(RegisterRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.Register(model);
+        var result = await _authService.Register(requestDto);
 
         if (result.Succeeded)
             return Ok(result);

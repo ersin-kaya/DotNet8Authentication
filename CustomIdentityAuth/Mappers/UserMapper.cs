@@ -5,12 +5,12 @@ namespace CustomIdentityAuth.Mappers;
 
 public static class UserMapper
 {
-    public static ApplicationUser MapToApplicationUserForRegister(this RegisterModel model)
+    public static ApplicationUser MapToApplicationUserForRegister(this RegisterRequestDto requestDto)
     {
-        return new ApplicationUser(model.UserName)
+        return new ApplicationUser(requestDto.UserName)
         {
-            Email = model.Email,
-            FullName = model.FullName
+            Email = requestDto.Email,
+            FullName = requestDto.FullName
         };
     }
 
