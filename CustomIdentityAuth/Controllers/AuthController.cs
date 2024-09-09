@@ -45,12 +45,12 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestModel model)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto requestDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _authService.RefreshToken(model);
+        var result = await _authService.RefreshToken(requestDto);
 
         if (result.Succeeded)
             return Ok(result);

@@ -92,16 +92,16 @@ public class AuthService : IAuthService
         return ServiceResult<LoginResponseDto>.Success(data:loginResult, message:Messages.LoginSuccess);
     }
 
-    public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestModel model)
+    public async Task<IServiceResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenRequestDto requestDto)
     {
-        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(model.AccessToken).Data;
+        ClaimsPrincipal principal = _tokenService.GetPrincipalFromExpiredToken(requestDto.AccessToken).Data;
         string? email = principal.FindFirstValue(ClaimTypes.Email);
 
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
             return ServiceResult<RefreshTokenResponseDto>.Failure(errorMessage:Messages.InvalidLoginAttempt, message:Messages.RefreshTokenFailed);
 
-        if (user.RefreshToken != model.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
+        if (user.RefreshToken != requestDto.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
         
         var updatedUserToken = (await CreateUserTokenAsync(user)).Data;

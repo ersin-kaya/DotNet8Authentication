@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace CustomIdentityAuth.Models;
+namespace CustomIdentityAuth.Dtos;
 
-public class RefreshTokenRequestModel
+public class RefreshTokenRequestDto
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; }
