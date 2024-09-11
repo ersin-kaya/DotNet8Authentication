@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Factories.Abstracts;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
@@ -16,11 +17,13 @@ public class TokenService : ITokenService
 {
     private readonly ISettingsService _settingsService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IAuthTokenFactory _authTokenFactory;
 
-    public TokenService(UserManager<ApplicationUser> userManager, ISettingsService settingsService)
+    public TokenService(UserManager<ApplicationUser> userManager, ISettingsService settingsService, IAuthTokenFactory authTokenFactory)
     {
         _userManager = userManager;
         _settingsService = settingsService;
+        _authTokenFactory = authTokenFactory;
     }
 
     public async Task<IServiceResult<AuthTokenDto>> GenerateJwtToken(ApplicationUser user)
@@ -48,9 +51,9 @@ public class TokenService : ITokenService
         );
         
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        var userToken = new AuthTokenDto { AccessToken = tokenString, ExpiresAt = token.ValidTo };
+        var authTokenDto = _authTokenFactory.CreateForAccessToken(accessToken:tokenString, expiresAt:token.ValidTo);
         
-        return ServiceResult<AuthTokenDto>.Success(data:userToken, message:Messages.TokenGenerationSuccess);
+        return ServiceResult<AuthTokenDto>.Success(data:authTokenDto, message:Messages.TokenGenerationSuccess);
     }
 
     public Task<IServiceResult<AuthTokenDto>> GenerateRefreshToken(ApplicationUser user)
@@ -58,10 +61,10 @@ public class TokenService : ITokenService
         var randomNumber = new byte[64];
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
         randomNumberGenerator.GetBytes(randomNumber);
+        
+        var authTokenDto = _authTokenFactory.CreateForRefreshToken(refreshToken:Convert.ToBase64String(randomNumber));
 
-        var refreshToken = new AuthTokenDto { RefreshToken = Convert.ToBase64String(randomNumber) };
-
-        var result = ServiceResult<AuthTokenDto>.Success(data: refreshToken, message:Messages.RefreshTokenGenerationSuccess);
+        var result = ServiceResult<AuthTokenDto>.Success(data:authTokenDto, message:Messages.RefreshTokenGenerationSuccess);
         return Task.FromResult((IServiceResult<AuthTokenDto>)result);
     }
 
