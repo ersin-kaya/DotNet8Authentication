@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Data;
+using CustomIdentityAuth.Factories.Abstracts;
+using CustomIdentityAuth.Factories.Concretes;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Services;
 using CustomIdentityAuth.Services.Settings;
@@ -84,6 +86,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ISettingsService, SettingsService>();
+builder.Services.AddTransient<IAuthTokenFactory, AuthTokenFactory>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
