@@ -14,6 +14,5 @@ public class AuthTokenDto
     public string RefreshToken { get; set; }
     
     [JsonPropertyName("expires_at")]
-    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public DateTimeOffset ExpiresAt { get; set; }
 }
