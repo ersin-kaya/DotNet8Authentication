@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
+using CustomIdentityAuth.Dtos.Abstracts;
 
 namespace CustomIdentityAuth.Dtos.Concretes;
 
-public class AuthTokenDto
+public class AuthTokenDto : ITokenDto
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; }

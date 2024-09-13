@@ -1,6 +1,8 @@
+using CustomIdentityAuth.Dtos.Abstracts;
+
 namespace CustomIdentityAuth.Dtos.Concretes;
 
-public class ApplicationUserDto
+public class ApplicationUserDto : IDto
 {
     public string Id { get; set; }
     public string FullName { get; set; }
