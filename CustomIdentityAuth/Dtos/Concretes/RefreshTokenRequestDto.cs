@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
+using CustomIdentityAuth.Dtos.Abstracts;
 
-namespace CustomIdentityAuth.Dtos;
+namespace CustomIdentityAuth.Dtos.Concretes;
 
-public class RefreshTokenRequestDto
+public class RefreshTokenRequestDto : IRequestDto
 {
     [JsonPropertyName("access_token")]
     public string AccessToken { get; set; }

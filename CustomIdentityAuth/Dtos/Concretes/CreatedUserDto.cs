@@ -1,6 +1,8 @@
-namespace CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Abstracts;
 
-public class CreatedUserDto<TId>
+namespace CustomIdentityAuth.Dtos.Concretes;
+
+public class CreatedUserDto<TId> : IDto
 {
     public TId Id { get; set; }
     public string Email { get; set; }

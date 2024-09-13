@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Concretes;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 

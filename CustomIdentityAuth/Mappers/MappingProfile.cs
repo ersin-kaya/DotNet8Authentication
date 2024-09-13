@@ -1,5 +1,5 @@
 using AutoMapper;
-using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Concretes;
 using CustomIdentityAuth.Models;
 
 namespace CustomIdentityAuth.Mappers;

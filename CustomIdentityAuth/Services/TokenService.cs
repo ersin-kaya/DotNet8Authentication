@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
-using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Concretes;
 using CustomIdentityAuth.Factories.Abstracts;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;

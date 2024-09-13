@@ -1,4 +1,4 @@
-using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Concretes;
 using CustomIdentityAuth.Services;
 using Microsoft.AspNetCore.Mvc;
 

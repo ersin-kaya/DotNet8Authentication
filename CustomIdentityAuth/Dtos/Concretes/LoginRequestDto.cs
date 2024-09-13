@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using CustomIdentityAuth.Constants;
+using CustomIdentityAuth.Dtos.Abstracts;
 
-namespace CustomIdentityAuth.Dtos;
+namespace CustomIdentityAuth.Dtos.Concretes;
 
-public class LoginRequestDto
+public class LoginRequestDto : IRequestDto
 {
     [Required]
     [EmailAddress]
