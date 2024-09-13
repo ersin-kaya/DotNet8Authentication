@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using CustomIdentityAuth.Constants;
 
-namespace CustomIdentityAuth.Dtos;
+namespace CustomIdentityAuth.Dtos.Concretes;
 
 public class LoginRequestDto
 {

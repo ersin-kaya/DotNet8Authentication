@@ -1,4 +1,4 @@
-namespace CustomIdentityAuth.Dtos;
+namespace CustomIdentityAuth.Dtos.Concretes;
 
 public class ApplicationUserDto
 {

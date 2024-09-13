@@ -1,5 +1,4 @@
-using CustomIdentityAuth.Dtos;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Dtos.Concretes;
 using CustomIdentityAuth.Results;
 
 namespace CustomIdentityAuth.Services;

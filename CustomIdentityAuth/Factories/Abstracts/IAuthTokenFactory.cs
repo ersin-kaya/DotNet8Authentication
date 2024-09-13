@@ -1,4 +1,4 @@
-using CustomIdentityAuth.Dtos;
+using CustomIdentityAuth.Dtos.Concretes;
 
 namespace CustomIdentityAuth.Factories.Abstracts;
 

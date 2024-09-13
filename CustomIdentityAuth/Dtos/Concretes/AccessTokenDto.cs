@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace CustomIdentityAuth.Dtos;
+namespace CustomIdentityAuth.Dtos.Concretes;
 
 public class AccessTokenDto
 {
