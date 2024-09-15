@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Factories.Abstracts;
 using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
@@ -17,19 +16,17 @@ public class TokenService : ITokenService
 {
     private readonly ISettingsService _settingsService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IAuthTokenFactory _authTokenFactory;
 
-    public TokenService(UserManager<ApplicationUser> userManager, ISettingsService settingsService, IAuthTokenFactory authTokenFactory)
+    public TokenService(UserManager<ApplicationUser> userManager, ISettingsService settingsService)
     {
         _userManager = userManager;
         _settingsService = settingsService;
-        _authTokenFactory = authTokenFactory;
     }
 
-    public async Task<IServiceResult<AuthTokenDto>> GenerateJwtToken(ApplicationUser user)
+    public async Task<IServiceResult<AccessTokenDto>> GenerateJwtToken(ApplicationUser user)
     {
         var userRoles = await _userManager.GetRolesAsync(user);
-        
+
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
@@ -41,7 +38,7 @@ public class TokenService : ITokenService
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settingsService.TokenSettings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        
+
         var token = new JwtSecurityToken(
             issuer: _settingsService.TokenSettings.Issuer,
             audience: _settingsService.TokenSettings.Audience,
@@ -49,23 +46,24 @@ public class TokenService : ITokenService
             expires: DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes),
             signingCredentials: creds
         );
-        
+
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-        var authTokenDto = _authTokenFactory.CreateForAccessToken(accessToken:tokenString, expiresAt:token.ValidTo);
-        
-        return ServiceResult<AuthTokenDto>.Success(data:authTokenDto, message:Messages.TokenGenerationSuccess);
+        var accessTokenDto = new AccessTokenDto { AccessToken = tokenString, ExpiresAt = token.ValidTo };
+
+        return ServiceResult<AccessTokenDto>.Success(data: accessTokenDto, message: Messages.TokenGenerationSuccess);
     }
 
-    public Task<IServiceResult<AuthTokenDto>> GenerateRefreshToken(ApplicationUser user)
+    public Task<IServiceResult<RefreshTokenDto>> GenerateRefreshToken(ApplicationUser user)
     {
         var randomNumber = new byte[64];
         using RandomNumberGenerator randomNumberGenerator = RandomNumberGenerator.Create();
         randomNumberGenerator.GetBytes(randomNumber);
-        
-        var authTokenDto = _authTokenFactory.CreateForRefreshToken(refreshToken:Convert.ToBase64String(randomNumber));
 
-        var result = ServiceResult<AuthTokenDto>.Success(data:authTokenDto, message:Messages.RefreshTokenGenerationSuccess);
-        return Task.FromResult((IServiceResult<AuthTokenDto>)result);
+        var refreshTokenDto = new RefreshTokenDto {RefreshToken = Convert.ToBase64String(randomNumber)};
+
+        var result =
+            ServiceResult<RefreshTokenDto>.Success(data: refreshTokenDto, message: Messages.RefreshTokenGenerationSuccess);
+        return Task.FromResult(result as IServiceResult<RefreshTokenDto>);
     }
 
     public IServiceResult<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
@@ -79,7 +77,8 @@ public class TokenService : ITokenService
             ValidIssuer = _settingsService.TokenSettings.Issuer,
             ValidAudience = _settingsService.TokenSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settingsService.TokenSettings.Key)),
-            ClockSkew = TimeSpan.Zero // This sets the time tolerance for JWT validation to zero, meaning the token must be valid exactly within the specified time frame, with no deviations allowed.
+            ClockSkew = TimeSpan
+                .Zero // This sets the time tolerance for JWT validation to zero, meaning the token must be valid exactly within the specified time frame, with no deviations allowed.
         };
 
         JwtSecurityTokenHandler tokenHandler = new();
@@ -92,6 +91,6 @@ public class TokenService : ITokenService
            )
             throw new SecurityTokenException(Messages.InvalidToken);
 
-        return ServiceResult<ClaimsPrincipal>.Success(data:principal, message:Messages.PrincipalExtractionSuccess);
+        return ServiceResult<ClaimsPrincipal>.Success(data: principal, message: Messages.PrincipalExtractionSuccess);
     }
 }
