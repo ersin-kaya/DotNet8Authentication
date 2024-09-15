@@ -73,8 +73,8 @@ public class AuthService : IAuthService
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.TokenGenerationFailed,
                 message: Messages.LoginError);
 
-        var userToken = tokenGenerationResult.Data;
-        user.RefreshToken = userToken.RefreshToken;
+        var authTokenDto = tokenGenerationResult.Data;
+        user.RefreshToken = authTokenDto.RefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
 
         var updateUserResult = await _userManager.UpdateAsync(user);
@@ -89,9 +89,9 @@ public class AuthService : IAuthService
                 errorMessages: updateSecurityStampResult.Errors.Select(e => e.Description),
                 message: Messages.SecurityStampUpdateFailed);
 
-        userToken.ExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
+        authTokenDto.ExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
 
-        var loginResult = userToken.MapToLoginResponseDto();
+        var loginResult = authTokenDto.MapToLoginResponseDto();
         return ServiceResult<LoginResponseDto>.Success(data: loginResult, message: Messages.LoginSuccess);
     }
 
@@ -108,8 +108,8 @@ public class AuthService : IAuthService
         if (user.RefreshToken != requestDto.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
-        var updatedUserToken = (await CreateUserTokenAsync(user)).Data;
-        user.RefreshToken = updatedUserToken.RefreshToken;
+        var updatedAuthTokenDto = (await CreateUserTokenAsync(user)).Data;
+        user.RefreshToken = updatedAuthTokenDto.RefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
 
         var updateUserResult = await _userManager.UpdateAsync(user);
@@ -126,7 +126,7 @@ public class AuthService : IAuthService
 
         var accessTokenExpiresAt = DateTime.Now.AddMinutes(_settingsService.TokenSettings.ExpirationMinutes);
 
-        var refreshTokenResult = updatedUserToken.MapToRefreshTokenResponseDto(accessTokenExpiresAt);
+        var refreshTokenResult = updatedAuthTokenDto.MapToRefreshTokenResponseDto(accessTokenExpiresAt);
         return ServiceResult<RefreshTokenResponseDto>.Success(data: refreshTokenResult,
             message: Messages.RefreshTokenSuccess);
     }
