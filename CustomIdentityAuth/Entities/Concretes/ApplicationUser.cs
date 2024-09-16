@@ -8,7 +8,7 @@ public class ApplicationUser : IdentityUser
     public string LastName { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiration { get; set; }
-    public DateTime LastActivity { get; set; }
+    public DateTime LastActivity { get; set; } = DateTime.UtcNow;
     
     public DateTime CreatedDate { get; private set; }
     public DateTime? UpdatedDate { get; set; }
