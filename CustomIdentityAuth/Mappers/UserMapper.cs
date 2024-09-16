@@ -1,5 +1,5 @@
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities;
 
 namespace CustomIdentityAuth.Mappers;
 

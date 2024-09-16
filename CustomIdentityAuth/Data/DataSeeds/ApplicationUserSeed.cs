@@ -1,4 +1,4 @@
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace CustomIdentityAuth.Data.DataSeeds;

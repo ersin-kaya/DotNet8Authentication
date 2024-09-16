@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos.Concretes;
+using CustomIdentityAuth.Entities;
 using CustomIdentityAuth.Extensions;
 using CustomIdentityAuth.Mappers;
-using CustomIdentityAuth.Models;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.AspNetCore.Identity;
