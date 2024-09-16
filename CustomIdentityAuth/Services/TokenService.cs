@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Results;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.AspNetCore.Identity;

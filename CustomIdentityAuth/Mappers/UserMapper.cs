@@ -1,5 +1,5 @@
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities.Concretes;
 
 namespace CustomIdentityAuth.Mappers;
 
@@ -10,7 +10,8 @@ public static class UserMapper
         return new ApplicationUser(requestDto.UserName)
         {
             Email = requestDto.Email,
-            FullName = requestDto.FullName
+            FirstName = requestDto.FirstName,
+            LastName = requestDto.LastName
         };
     }
 
@@ -18,11 +19,11 @@ public static class UserMapper
     {
         return new CreatedUserDto<string>
         {
-            Id = user.Id,
             Email = user.Email,
             UserName = user.UserName,
-            FullName = user.FullName,
-            Roles = roles
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            LastActivity = user.LastActivity
         };
     }
 }

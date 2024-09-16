@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Data;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Services;
 using CustomIdentityAuth.Services.Settings;
 using Microsoft.EntityFrameworkCore;

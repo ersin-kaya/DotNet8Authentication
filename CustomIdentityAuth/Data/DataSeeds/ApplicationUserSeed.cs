@@ -1,4 +1,4 @@
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities.Concretes;
 using Microsoft.AspNetCore.Identity;
 
 namespace CustomIdentityAuth.Data.DataSeeds;
@@ -21,7 +21,8 @@ public static class ApplicationUserSeed
                 NormalizedUserName = "ADMIN",
                 Email = "admin@example.com",
                 NormalizedEmail = "ADMIN@EXAMPLE.COM",
-                FullName = "Admin",
+                FirstName = "Admin",
+                LastName = string.Empty,
                 SecurityStamp = Guid.NewGuid().ToString("D"),
                 ConcurrencyStamp = Guid.NewGuid().ToString(),
                 PasswordHash = _passwordHasher.HashPassword(null, "String1234.")
@@ -29,11 +30,12 @@ public static class ApplicationUserSeed
             new()
             {
                 Id = UserId,
-                UserName = "test_user",
-                NormalizedUserName = "TEST_USER",
-                Email = "test_user@example.com",
-                NormalizedEmail = "TEST_USER@EXAMPLE.COM",
-                FullName = "Test User",
+                UserName = "user",
+                NormalizedUserName = "USER",
+                Email = "user@example.com",
+                NormalizedEmail = "USER@EXAMPLE.COM",
+                FirstName = "User",
+                LastName = string.Empty,
                 SecurityStamp = Guid.NewGuid().ToString("D"),
                 ConcurrencyStamp = Guid.NewGuid().ToString(),
                 PasswordHash = _passwordHasher.HashPassword(null, "String1234.")

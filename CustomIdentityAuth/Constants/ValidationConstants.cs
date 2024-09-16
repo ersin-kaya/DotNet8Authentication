@@ -10,7 +10,11 @@ public static class ValidationConstants
     public const int UserNameMaxLength = 20;
     public const int UserNameMinLength = 5;
 
-    // FullName constraints
-    public const int FullNameMaxLength = 64;
-    public const int FullNameMinLength = 4;
+    // FirstName constraints
+    public const int FirstNameMaxLength = 32;
+    public const int FirstNameMinLength = 2;
+    
+    // LastName constraints
+    public const int LastNameMaxLength = 32;
+    public const int LastNameMinLength = 2;
 }

@@ -1,6 +1,6 @@
 using AutoMapper;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Models;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
