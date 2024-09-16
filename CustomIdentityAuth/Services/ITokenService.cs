@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Entities;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Results;
 
 namespace CustomIdentityAuth.Services;

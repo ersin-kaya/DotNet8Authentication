@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using CustomIdentityAuth.Constants;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Entities;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Extensions;
 using CustomIdentityAuth.Mappers;
 using CustomIdentityAuth.Results;

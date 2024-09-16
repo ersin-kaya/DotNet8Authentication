@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace CustomIdentityAuth.Entities;
+namespace CustomIdentityAuth.Entities.Concretes;
 
 public class ApplicationUser : IdentityUser
 {

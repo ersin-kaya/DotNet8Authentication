@@ -1,5 +1,5 @@
 using CustomIdentityAuth.Constants;
-using CustomIdentityAuth.Entities;
+using CustomIdentityAuth.Entities.Concretes;
 using CustomIdentityAuth.Services;
 
 namespace CustomIdentityAuth.Extensions;

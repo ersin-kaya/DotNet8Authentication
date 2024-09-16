@@ -1,6 +1,6 @@
 using AutoMapper;
 using CustomIdentityAuth.Dtos.Concretes;
-using CustomIdentityAuth.Entities;
+using CustomIdentityAuth.Entities.Concretes;
 
 namespace CustomIdentityAuth.Mappers;
 
