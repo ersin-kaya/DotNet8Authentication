@@ -68,7 +68,7 @@ public class AuthService : IAuthService
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
 
-        var tokenGenerationResult = await CreateUserTokenAsync(user);
+        var tokenGenerationResult = await CreateAuthTokenAsync(user);
         if (!tokenGenerationResult.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.TokenGenerationFailed,
                 message: Messages.LoginError);
@@ -108,7 +108,7 @@ public class AuthService : IAuthService
         if (user.RefreshToken != requestDto.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
 
-        var updatedAuthTokenDto = (await CreateUserTokenAsync(user)).Data;
+        var updatedAuthTokenDto = (await CreateAuthTokenAsync(user)).Data;
         user.RefreshToken = updatedAuthTokenDto.RefreshToken;
         user.RefreshTokenExpiration = DateTime.Now.AddDays(_settingsService.TokenSettings.RefreshTokenExpirationDays);
 
@@ -135,7 +135,7 @@ public class AuthService : IAuthService
 
     #region Helper Methods
 
-    private async Task<IServiceResult<AuthTokenDto>> CreateUserTokenAsync(ApplicationUser user)
+    private async Task<IServiceResult<AuthTokenDto>> CreateAuthTokenAsync(ApplicationUser user)
     {
         var accessTokenDto = (await _tokenService.GenerateJwtToken(user)).Data;
         var refreshToken = await _tokenService.GetRefreshTokenAsync(user);
