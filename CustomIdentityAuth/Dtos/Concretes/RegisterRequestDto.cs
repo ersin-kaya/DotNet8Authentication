@@ -22,6 +22,10 @@ public class RegisterRequestDto : IRequestDto
     public string ConfirmPassword { get; set; }
     
     [Required]
-    [StringLength(ValidationConstants.FullNameMaxLength, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = ValidationConstants.FullNameMinLength)]
-    public string FullName { get; set; }
+    [StringLength(ValidationConstants.FirstNameMaxLength, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = ValidationConstants.FirstNameMinLength)]
+    public string FirstName { get; set; }
+    
+    [Required]
+    [StringLength(ValidationConstants.LastNameMaxLength, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = ValidationConstants.LastNameMinLength)]
+    public string LastName { get; set; }
 }
