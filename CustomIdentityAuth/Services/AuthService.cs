@@ -17,14 +17,16 @@ public class AuthService : IAuthService
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
     private readonly ISettingsService _settingsService;
+    private readonly IUserService _userService;
 
     public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
-        ITokenService tokenService, ISettingsService settingsService)
+        ITokenService tokenService, ISettingsService settingsService, IUserService userService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
         _settingsService = settingsService;
+        _userService = userService;
     }
 
     #region Public Service Methods
@@ -68,6 +70,8 @@ public class AuthService : IAuthService
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
 
+        await _userService.UpdateLastActivityAsync(requestDto.Email);
+        
         var tokenGenerationResult = await CreateAuthTokenAsync(user);
         if (!tokenGenerationResult.Succeeded)
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.TokenGenerationFailed,

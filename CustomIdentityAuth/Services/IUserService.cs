@@ -5,5 +5,6 @@ namespace CustomIdentityAuth.Services;
 
 public interface IUserService
 {
+    Task UpdateLastActivityAsync(string email);
     Task<IServiceResult<List<ApplicationUserDto>>> GetUsersAsync();
 }

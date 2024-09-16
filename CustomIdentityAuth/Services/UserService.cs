@@ -18,11 +18,22 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
+    public async Task UpdateLastActivityAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user != null)
+        {
+            user.LastActivity = DateTime.UtcNow;
+            var updateUserResult = await _userManager.UpdateAsync(user);
+            if (!updateUserResult.Succeeded) { } // Log
+        } // Log
+    }
+
     public async Task<IServiceResult<List<ApplicationUserDto>>> GetUsersAsync()
     {
         var users = await _userManager.Users.ToListAsync();
         var userDtos = _mapper.Map<List<ApplicationUserDto>>(users);
-        
+
         return ServiceResult<List<ApplicationUserDto>>.Success(userDtos);
     }
 }
