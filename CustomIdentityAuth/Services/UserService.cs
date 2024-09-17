@@ -18,9 +18,9 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task UpdateLastActivityAsync(string email)
+    public async Task UpdateLastActivityAsync(string userId)
     {
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByIdAsync(userId);
         if (user != null)
         {
             user.LastActivity = DateTime.UtcNow;
