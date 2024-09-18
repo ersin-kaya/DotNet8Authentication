@@ -70,7 +70,7 @@ public class AuthService : IAuthService
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
 
-        await _userService.UpdateLastActivityAsync(requestDto.Email);
+        await _userService.UpdateLastActivityAsync(user.Id);
         
         var tokenGenerationResult = await CreateAuthTokenAsync(user);
         if (!tokenGenerationResult.Succeeded)
@@ -111,6 +111,8 @@ public class AuthService : IAuthService
 
         if (user.RefreshToken != requestDto.RefreshToken || user.RefreshTokenExpiration <= DateTime.Now)
             throw new SecurityTokenException(Messages.InvalidRefreshToken);
+        
+        await _userService.UpdateLastActivityAsync(user.Id);
 
         var updatedAuthTokenDto = (await CreateAuthTokenAsync(user)).Data;
         user.RefreshToken = updatedAuthTokenDto.RefreshToken;
