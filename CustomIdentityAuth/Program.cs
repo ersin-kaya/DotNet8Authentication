@@ -53,6 +53,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSingleton<ISettingsService, SettingsService>();
 builder.Services.AddScoped<UpdateLastActivityFilter>();
+// builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers(options =>
 {

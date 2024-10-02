@@ -70,7 +70,7 @@ public class AuthService : IAuthService
             return ServiceResult<LoginResponseDto>.Failure(errorMessage: Messages.InvalidLoginAttempt,
                 message: Messages.LoginError);
 
-        await _userService.UpdateLastActivityAsync(user.Id);
+        // await _userService.IsUserAuthorized(user.Id);
         
         var tokenGenerationResult = await CreateAuthTokenAsync(user);
         if (!tokenGenerationResult.Succeeded)
